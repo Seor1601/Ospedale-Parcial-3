@@ -47,6 +47,10 @@ public class Appointment {
         this.followUp = followUp;
     }
 
+    public void setDatetime(LocalDateTime datetime) {
+        this.datetime = datetime;
+    }
+
     public Appointment(String id, Patient patient, Doctor doctor, Specialty specialty, LocalDateTime datetime, String reason, boolean type) {
         this.id = id;
         this.patient = patient;
@@ -89,6 +93,30 @@ public class Appointment {
 
     public Patient getPatient() {
         return patient;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public ArrayList<Prescription> getPrescriptions() {
+        return prescriptions;
+    }
+
+    public String getDiagnosis() {
+        return diagnosis;
+    }
+
+    public String getObservations() {
+        return observations;
+    }
+
+    public String getRecommendedTreatment() {
+        return recommendedTreatment;
+    }
+
+    public String getFollowUp() {
+        return followUp;
     }
 
     public boolean addPrescription(Prescription prescrip) {
