@@ -405,7 +405,6 @@ public class NewJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // Login. txtLoginUsername = username, txtLoginPassword = password.
         String username = txtLoginUsername.getText().trim();
         String password = txtLoginPassword.getText();
 
@@ -438,11 +437,6 @@ public class NewJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void btnRegisterPatientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        // Patient register tab. Fields:
-        // jTextField3=firstname, jTextField4=lastname, jTextField5=id, jTextField6=phone,
-        // jTextField7=email, jTextField8=username, jTextField9=password,
-        // jTextField10=passwordConfirm, jTextField11=address, jTextField12=birthdate (YYYY-MM-DD),
-        // jComboBox1=gender (0=Select, 1=Female, 2=Male)
         String idText = jTextField5.getText().trim();
         long id;
         try {

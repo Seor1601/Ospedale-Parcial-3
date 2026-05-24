@@ -61,7 +61,6 @@ public class NewJFrame111 extends javax.swing.JFrame {
         jTextField6.setText(doctor.getLicenceNumber());
         jTextField8.setText(doctor.getAssignedOffice());
         jTextField7.setText(doctor.getUsername());
-        // cmbDoctorSpecialty specialty: select matching item (pretty names with "&")
         String prettySpecialty = prettySpecialty(doctor.getSpecialty());
         for (int i = 0; i < cmbDoctorSpecialty.getItemCount(); i++) {
             if (cmbDoctorSpecialty.getItemAt(i).equals(prettySpecialty)) {
@@ -1262,21 +1261,15 @@ public class NewJFrame111 extends javax.swing.JFrame {
     }//GEN-LAST:event_panelRound2MouseDragged
 
     private void btnCloseWindowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // X: cerrar app
         System.exit(0);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
-        // Pending appointments
         jRadioButton3.setSelected(false);
         loadAppointmentsTable(true);
     }//GEN-LAST:event_jRadioButton4ActionPerformed
 
     private void btnSaveDoctorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        // Save - actualizar datos del doctor
-        // jTextField1=firstname, jTextField2=lastname, cmbDoctorSpecialty=specialty,
-        // jTextField6=licenseNumber, jTextField8=assignedOffice, jTextField7=username,
-        // jTextField9=password, jTextField10=passwordConfirm
         if (cmbDoctorSpecialty.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(this, "Selecciona una especialidad.");
             return;
@@ -1303,19 +1296,16 @@ public class NewJFrame111 extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
-        // Logout: volver al login
         new NewJFrame().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton12ActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
-        // Back: volver a la vista de admin (solo si fromAdmin)
         new NewJFrame11(user).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton11ActionPerformed
 
     private void btnCancelHospitalizationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
-        // Cancel hospitalization request (deny)
         int idx = cmbHospitalizationRequest.getSelectedIndex();
         if (idx <= 0 || idx > hospitalizationRequestIds.size()) {
             JOptionPane.showMessageDialog(this, "Selecciona una solicitud de hospitalizacion.");
@@ -1330,7 +1320,6 @@ public class NewJFrame111 extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton13ActionPerformed
 
     private void btnGenerateHospitalizationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        // Generate: aprueba solicitud (si jRadioButton5) o crea nueva hospitalizacion (si jRadioButton6)
         if (jRadioButton5.isSelected()) {
             int idx = cmbHospitalizationRequest.getSelectedIndex();
             if (idx <= 0 || idx > hospitalizationRequestIds.size()) {
@@ -1353,7 +1342,6 @@ public class NewJFrame111 extends javax.swing.JFrame {
             String date = jTextField21.getText().trim();
             String reason = jTextArea9.getText().trim();
             String observations = jTextArea1.getText().trim();
-            // El .form no expone un combo de RoomType en esta vista, default STANDARD.
             Response response = hospitalizationController.requestHospitalization(
                     selectedPatient.getId(), doctor.getId(), date, reason, "STANDARD", observations);
             JOptionPane.showMessageDialog(this, response.getMessage());
@@ -1370,7 +1358,6 @@ public class NewJFrame111 extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void btnSearchPatientHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        // Search: cargar historial de citas del paciente seleccionado
         int idx = jComboBox5.getSelectedIndex();
         if (idx <= 0 || idx > allPatients.size()) {
             JOptionPane.showMessageDialog(this, "Selecciona un paciente.");
@@ -1399,13 +1386,11 @@ public class NewJFrame111 extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
-        // Total appointments
         jRadioButton4.setSelected(false);
         loadAppointmentsTable(false);
     }//GEN-LAST:event_jRadioButton3ActionPerformed
 
     private void btnAcceptAppointmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // Accept appointment
         int idx = jComboBox2.getSelectedIndex();
         if (idx <= 0 || idx > requestedAppointmentIds.size()) {
             JOptionPane.showMessageDialog(this, "Selecciona una cita a aceptar.");
@@ -1421,7 +1406,6 @@ public class NewJFrame111 extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void btnCompleteAppointmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // Complete appointment
         int idx = jComboBox4.getSelectedIndex();
         if (idx <= 0 || idx > pendingAppointmentIds.size()) {
             JOptionPane.showMessageDialog(this, "Selecciona una cita pendiente.");
@@ -1448,13 +1432,11 @@ public class NewJFrame111 extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void btnClearPrescriptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        // Limpiar tabla local de prescripciones (solo vista)
         DefaultTableModel model = (DefaultTableModel) tblPrescriptions.getModel();
         model.setRowCount(0);
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void btnAddPrescriptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        // Add prescription (la cita debe estar PENDING)
         int idx = jComboBox7.getSelectedIndex();
         if (idx <= 0 || idx > prescriptableAppointmentIds.size()) {
             JOptionPane.showMessageDialog(this, "Selecciona una cita pendiente.");
@@ -1494,7 +1476,6 @@ public class NewJFrame111 extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void btnRescheduleAppointmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // Reschedule appointment. jTextField13 = nueva hora (HH:MM), jTextField14 = razon
         int idx = jComboBox3.getSelectedIndex();
         if (idx <= 0 || idx > reschedulableAppointmentIds.size()) {
             JOptionPane.showMessageDialog(this, "Selecciona una cita a reprogramar.");

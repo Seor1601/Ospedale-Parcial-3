@@ -1,6 +1,7 @@
 package packagee;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 public class Main {
@@ -12,7 +13,7 @@ public class Main {
         } catch (Exception ex) {
             System.err.println("Failed to initialize LaF");
         }
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 new NewJFrame().setVisible(true);
             }

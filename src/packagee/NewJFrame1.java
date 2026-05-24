@@ -83,7 +83,6 @@ public class NewJFrame1 extends javax.swing.JFrame {
     }
 
     private void loadAppointmentTypeCombo() {
-        // jComboBox1 ya viene con Select one / Remote / In-person desde el .form, no se modifica
     }
 
     private void refreshAppointmentsTable() {
@@ -856,12 +855,10 @@ public class NewJFrame1 extends javax.swing.JFrame {
     }//GEN-LAST:event_panelRound2MouseDragged
 
     private void btnCloseWindowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // X: cerrar app
         System.exit(0);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void btnCancelAppointmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // Cancelar cita. jComboBox4 = cita seleccionada
         int idx = jComboBox4.getSelectedIndex();
         if (idx <= 0 || idx > cancelableAppointmentIds.size()) {
             JOptionPane.showMessageDialog(this, "Selecciona una cita a cancelar.");
@@ -879,7 +876,6 @@ public class NewJFrame1 extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void btnSavePatientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        // Save - actualizar datos del paciente
         if (cmbPatientGender.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(this, "Selecciona un genero.");
             return;
@@ -907,19 +903,16 @@ public class NewJFrame1 extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        // Logout: volver al login
         new NewJFrame().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        // Back: solo visible si vino desde el admin
         new NewJFrame11(user).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
-        // Modo: solicitar cita por Especialidad
         if (jRadioButton4.isSelected()) {
             jRadioButton4.setSelected(false);
         }
@@ -932,7 +925,6 @@ public class NewJFrame1 extends javax.swing.JFrame {
     }//GEN-LAST:event_jRadioButton3ActionPerformed
 
     private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
-        // Modo: solicitar cita por Doctor
         if (jRadioButton3.isSelected()) {
             jRadioButton3.setSelected(false);
         }
@@ -945,7 +937,6 @@ public class NewJFrame1 extends javax.swing.JFrame {
     }//GEN-LAST:event_jRadioButton4ActionPerformed
 
     private void btnCreateAppointmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // Crear cita
         if (!jRadioButton3.isSelected() && !jRadioButton4.isSelected()) {
             JOptionPane.showMessageDialog(this, "Selecciona como solicitar la cita: por especialidad o por doctor.");
             return;
@@ -959,7 +950,6 @@ public class NewJFrame1 extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Selecciona el tipo de cita.");
             return;
         }
-        // jComboBox1: 1=Remote, 2=In-person. type=true significa IN_PERSON.
         boolean type = jComboBox1.getSelectedIndex() == 2;
         String date = jTextField12.getText().trim();
         String time = jTextField13.getText().trim();
@@ -989,13 +979,11 @@ public class NewJFrame1 extends javax.swing.JFrame {
 
 
     private void btnRefreshAppointmentsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        // Refresh: recargar tabla de citas
         refreshAppointmentsTable();
         refreshCancelableAppointments();
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void btnCreateHospitalizationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // Crear hospitalizacion
         int docIdx = jComboBox2.getSelectedIndex();
         if (docIdx <= 0 || docIdx > allDoctors.size()) {
             JOptionPane.showMessageDialog(this, "Selecciona un doctor.");

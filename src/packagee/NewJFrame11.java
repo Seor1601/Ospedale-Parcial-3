@@ -432,15 +432,10 @@ public class NewJFrame11 extends javax.swing.JFrame {
     }//GEN-LAST:event_panelRound2MouseDragged
 
     private void btnCloseWindowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // X: cerrar app
         System.exit(0);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void btnSaveDoctorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        // Save: registrar doctor
-        // jTextField3=firstname, jTextField4=lastname, jTextField5=id, cmbDoctorSpecialty=specialty,
-        // jTextField6=licenseNumber, jTextField7=assignedOffice, jTextField8=username,
-        // jTextField9=password, jTextField10=passwordConfirm
         long id;
         try {
             id = Long.parseLong(jTextField5.getText().trim());
@@ -484,7 +479,6 @@ public class NewJFrame11 extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void btnOpenDoctorViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // DOCTOR VIEW: abrir vista del doctor seleccionado (como admin)
         int idx = cmbDoctorSelect.getSelectedIndex();
         if (idx <= 0 || idx > doctorsInCombo.size()) {
             JOptionPane.showMessageDialog(this, "Selecciona un doctor.");
@@ -496,13 +490,11 @@ public class NewJFrame11 extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        // Logout: volver al login
         new NewJFrame().setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void btnOpenPatientViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // PATIENT VIEW: abrir vista del paciente seleccionado (como admin)
         int idx = cmbPatientSelect.getSelectedIndex();
         if (idx <= 0 || idx > patientsInCombo.size()) {
             JOptionPane.showMessageDialog(this, "Selecciona un paciente.");
