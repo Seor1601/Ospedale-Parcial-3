@@ -8,22 +8,25 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import packagee.controller.DoctorController;
+import packagee.controller.TableController;
 import packagee.controller.response.Response;
-import packagee.storage.DataStore;
 
 public class NewJFrame11 extends javax.swing.JFrame {
 
     private int x, y;
-    private final User user;
+    private final long adminId;
     private final DoctorController doctorController = new DoctorController();
+    private final TableController tableController = new TableController();
 
-    private final List<Doctor> doctorsInCombo = new ArrayList<>();
-    private final List<Patient> patientsInCombo = new ArrayList<>();
+    private final List<Long> doctorIds = new ArrayList<>();
+    private final List<Long> patientIds = new ArrayList<>();
 
-    public NewJFrame11(User user) {
+    public NewJFrame11(long adminId) {
         initComponents();
-        this.user = user;
+        this.adminId = adminId;
         this.setBackground(new Color(0, 0, 0, 0));
         this.setLocationRelativeTo(null);
         loadDoctorCombo();
@@ -31,22 +34,34 @@ public class NewJFrame11 extends javax.swing.JFrame {
     }
 
     private void loadDoctorCombo() {
-        doctorsInCombo.clear();
-        doctorsInCombo.addAll(DataStore.getInstance().getDoctors());
+        doctorIds.clear();
         cmbDoctorSelect.removeAllItems();
         cmbDoctorSelect.addItem("Select one");
-        for (Doctor doctor : doctorsInCombo) {
-            cmbDoctorSelect.addItem(doctor.getFirstname() + " " + doctor.getLastname() + " (#" + doctor.getId() + ")");
+        Response response = tableController.getDoctorsTableData();
+        if (!response.isSuccess() || response.getData() == null) {
+            return;
+        }
+        JSONArray doctors = new JSONArray(response.getData());
+        for (int i = 0; i < doctors.length(); i++) {
+            JSONObject doctor = doctors.getJSONObject(i);
+            doctorIds.add(doctor.getLong("id"));
+            cmbDoctorSelect.addItem(doctor.optString("firstname") + " " + doctor.optString("lastname") + " (#" + doctor.getLong("id") + ")");
         }
     }
 
     private void loadPatientCombo() {
-        patientsInCombo.clear();
-        patientsInCombo.addAll(DataStore.getInstance().getPatients());
+        patientIds.clear();
         cmbPatientSelect.removeAllItems();
         cmbPatientSelect.addItem("Select one");
-        for (Patient patient : patientsInCombo) {
-            cmbPatientSelect.addItem(patient.getFirstname() + " " + patient.getLastname() + " (#" + patient.getId() + ")");
+        Response response = tableController.getPatientsTableData();
+        if (!response.isSuccess() || response.getData() == null) {
+            return;
+        }
+        JSONArray patients = new JSONArray(response.getData());
+        for (int i = 0; i < patients.length(); i++) {
+            JSONObject patient = patients.getJSONObject(i);
+            patientIds.add(patient.getLong("id"));
+            cmbPatientSelect.addItem(patient.optString("firstname") + " " + patient.optString("lastname") + " (#" + patient.getLong("id") + ")");
         }
     }
 
@@ -459,7 +474,7 @@ public class NewJFrame11 extends javax.swing.JFrame {
                 specialty,
                 jTextField6.getText().trim(),
                 jTextField7.getText().trim(),
-                user instanceof Administrator
+                true
         );
 
         JOptionPane.showMessageDialog(this, response.getMessage());
@@ -480,12 +495,12 @@ public class NewJFrame11 extends javax.swing.JFrame {
 
     private void btnOpenDoctorViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         int idx = cmbDoctorSelect.getSelectedIndex();
-        if (idx <= 0 || idx > doctorsInCombo.size()) {
+        if (idx <= 0 || idx > doctorIds.size()) {
             JOptionPane.showMessageDialog(this, "Selecciona un doctor.");
             return;
         }
-        Doctor selected = doctorsInCombo.get(idx - 1);
-        new NewJFrame111(user, selected, true).setVisible(true);
+        long selectedDoctorId = doctorIds.get(idx - 1);
+        new NewJFrame111(adminId, selectedDoctorId, true).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -496,12 +511,12 @@ public class NewJFrame11 extends javax.swing.JFrame {
 
     private void btnOpenPatientViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         int idx = cmbPatientSelect.getSelectedIndex();
-        if (idx <= 0 || idx > patientsInCombo.size()) {
+        if (idx <= 0 || idx > patientIds.size()) {
             JOptionPane.showMessageDialog(this, "Selecciona un paciente.");
             return;
         }
-        Patient selected = patientsInCombo.get(idx - 1);
-        new NewJFrame1(user, selected, true).setVisible(true);
+        long selectedPatientId = patientIds.get(idx - 1);
+        new NewJFrame1(adminId, selectedPatientId, true).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton3ActionPerformed
 

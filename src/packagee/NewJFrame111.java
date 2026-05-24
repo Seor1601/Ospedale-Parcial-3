@@ -16,14 +16,14 @@ import packagee.controller.DoctorController;
 import packagee.controller.HospitalizationController;
 import packagee.controller.TableController;
 import packagee.controller.response.Response;
-import packagee.storage.DataStore;
 
 public class NewJFrame111 extends javax.swing.JFrame {
 
     private int x, y;
-    private final User user;
-    private final Doctor doctor;
+    private final long currentUserId;
+    private final long doctorId;
     private final boolean fromAdmin;
+    private JSONObject doctorData;
 
     private final DoctorController doctorController = new DoctorController();
     private final AppointmentController appointmentController = new AppointmentController();
@@ -35,12 +35,12 @@ public class NewJFrame111 extends javax.swing.JFrame {
     private final List<String> pendingAppointmentIds = new ArrayList<>();
     private final List<String> prescriptableAppointmentIds = new ArrayList<>();
     private final List<String> hospitalizationRequestIds = new ArrayList<>();
-    private final List<Patient> allPatients = new ArrayList<>();
+    private final List<Long> patientIds = new ArrayList<>();
 
-    public NewJFrame111(User user, Doctor doctor, boolean fromAdmin) {
+    public NewJFrame111(long currentUserId, long doctorId, boolean fromAdmin) {
         initComponents();
-        this.user = user;
-        this.doctor = doctor;
+        this.currentUserId = currentUserId;
+        this.doctorId = doctorId;
         this.fromAdmin = fromAdmin;
 
         btnBack.setVisible(fromAdmin);
@@ -56,12 +56,18 @@ public class NewJFrame111 extends javax.swing.JFrame {
     }
 
     private void fillProfileFields() {
-        jTextField1.setText(doctor.getFirstname());
-        jTextField2.setText(doctor.getLastname());
-        jTextField6.setText(doctor.getLicenceNumber());
-        jTextField8.setText(doctor.getAssignedOffice());
-        jTextField7.setText(doctor.getUsername());
-        String prettySpecialty = prettySpecialty(doctor.getSpecialty());
+        Response response = doctorController.getDoctorById(doctorId);
+        if (!response.isSuccess() || response.getData() == null) {
+            JOptionPane.showMessageDialog(this, response.getMessage());
+            return;
+        }
+        doctorData = new JSONObject(response.getData());
+        jTextField1.setText(doctorData.optString("firstname"));
+        jTextField2.setText(doctorData.optString("lastname"));
+        jTextField6.setText(doctorData.optString("licenceNumber"));
+        jTextField8.setText(doctorData.optString("assignedOffice"));
+        jTextField7.setText(doctorData.optString("username"));
+        String prettySpecialty = prettySpecialty(doctorData.optString("specialty"));
         for (int i = 0; i < cmbDoctorSpecialty.getItemCount(); i++) {
             if (cmbDoctorSpecialty.getItemAt(i).equals(prettySpecialty)) {
                 cmbDoctorSpecialty.setSelectedIndex(i);
@@ -70,32 +76,38 @@ public class NewJFrame111 extends javax.swing.JFrame {
         }
     }
 
-    private String prettySpecialty(Specialty s) {
-        switch (s) {
-            case GENERAL_MEDICINE: return "General Medicine";
-            case CARDIOLOGY: return "Cardiology";
-            case PEDIATRICS: return "Pediatrics";
-            case NEUROLOGY: return "Neurology";
-            case TRAUMATOLOGY_ORTHOPEDICS: return "Traumatology & Orthopedics";
-            case GYNECOLOGY_OBSTETRICS: return "Gynecology & Obstetrics";
-            case DERMATOLOGY: return "Dermatology";
-            case PSYCHIATRY: return "Psychiatry";
-            case ONCOLOGY: return "Oncology";
-            case OPHTHALMOLOGY: return "Ophthalmology";
-            case INTERNAL_MEDICINE: return "Internal Medicine";
-            default: return s.name();
+    private String prettySpecialty(String specialty) {
+        switch (specialty) {
+            case "GENERAL_MEDICINE": return "General Medicine";
+            case "CARDIOLOGY": return "Cardiology";
+            case "PEDIATRICS": return "Pediatrics";
+            case "NEUROLOGY": return "Neurology";
+            case "TRAUMATOLOGY_ORTHOPEDICS": return "Traumatology & Orthopedics";
+            case "GYNECOLOGY_OBSTETRICS": return "Gynecology & Obstetrics";
+            case "DERMATOLOGY": return "Dermatology";
+            case "PSYCHIATRY": return "Psychiatry";
+            case "ONCOLOGY": return "Oncology";
+            case "OPHTHALMOLOGY": return "Ophthalmology";
+            case "INTERNAL_MEDICINE": return "Internal Medicine";
+            default: return specialty;
         }
     }
 
     private void loadAllPatientsCombos() {
-        allPatients.clear();
-        allPatients.addAll(DataStore.getInstance().getPatients());
+        patientIds.clear();
         jComboBox5.removeAllItems();
         jComboBox5.addItem("Select one");
         jComboBox8.removeAllItems();
         jComboBox8.addItem("Select one");
-        for (Patient p : allPatients) {
-            String label = p.getFirstname() + " " + p.getLastname() + " (#" + p.getId() + ")";
+        Response response = tableController.getPatientsTableData();
+        if (!response.isSuccess() || response.getData() == null) {
+            return;
+        }
+        JSONArray patients = new JSONArray(response.getData());
+        for (int i = 0; i < patients.length(); i++) {
+            JSONObject patient = patients.getJSONObject(i);
+            patientIds.add(patient.getLong("id"));
+            String label = patient.optString("firstname") + " " + patient.optString("lastname") + " (#" + patient.getLong("id") + ")";
             jComboBox5.addItem(label);
             jComboBox8.addItem(label);
         }
@@ -116,7 +128,7 @@ public class NewJFrame111 extends javax.swing.JFrame {
         jComboBox7.removeAllItems();
         jComboBox7.addItem("Select one");
 
-        Response response = appointmentController.getDoctorAppointments(doctor.getId(), false);
+        Response response = appointmentController.getDoctorAppointments(doctorId, false);
         if (!response.isSuccess() || response.getData() == null) {
             return;
         }
@@ -148,7 +160,7 @@ public class NewJFrame111 extends javax.swing.JFrame {
         hospitalizationRequestIds.clear();
         cmbHospitalizationRequest.removeAllItems();
         cmbHospitalizationRequest.addItem("Select one");
-        Response response = hospitalizationController.getDoctorHospitalizations(doctor.getId());
+        Response response = hospitalizationController.getDoctorHospitalizations(doctorId);
         if (!response.isSuccess() || response.getData() == null) {
             return;
         }
@@ -170,7 +182,7 @@ public class NewJFrame111 extends javax.swing.JFrame {
     private void loadAppointmentsTable(boolean onlyPending) {
         DefaultTableModel model = (DefaultTableModel) tblDoctorAppointments.getModel();
         model.setRowCount(0);
-        Response response = tableController.getDoctorAppointmentsTableData(doctor.getId(), onlyPending);
+        Response response = tableController.getDoctorAppointmentsTableData(doctorId, onlyPending);
         if (!response.isSuccess() || response.getData() == null) {
             return;
         }
@@ -1276,7 +1288,7 @@ public class NewJFrame111 extends javax.swing.JFrame {
         }
         String specialty = cmbDoctorSpecialty.getItemAt(cmbDoctorSpecialty.getSelectedIndex());
         Response response = doctorController.updateDoctor(
-                doctor.getId(),
+                doctorId,
                 jTextField7.getText().trim(),
                 jTextField1.getText().trim(),
                 jTextField2.getText().trim(),
@@ -1285,7 +1297,7 @@ public class NewJFrame111 extends javax.swing.JFrame {
                 specialty,
                 jTextField6.getText().trim(),
                 jTextField8.getText().trim(),
-                user instanceof Administrator
+                fromAdmin
         );
         JOptionPane.showMessageDialog(this, response.getMessage());
         if (response.isSuccess()) {
@@ -1301,7 +1313,7 @@ public class NewJFrame111 extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton12ActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
-        new NewJFrame11(user).setVisible(true);
+        new NewJFrame11(currentUserId).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton11ActionPerformed
 
@@ -1312,7 +1324,7 @@ public class NewJFrame111 extends javax.swing.JFrame {
             return;
         }
         String hospitalizationId = hospitalizationRequestIds.get(idx - 1);
-        Response response = hospitalizationController.denyHospitalization(hospitalizationId, doctor.getId());
+        Response response = hospitalizationController.denyHospitalization(hospitalizationId, doctorId);
         JOptionPane.showMessageDialog(this, response.getMessage());
         if (response.isSuccess()) {
             refreshHospitalizationRequestsCombo();
@@ -1327,23 +1339,38 @@ public class NewJFrame111 extends javax.swing.JFrame {
                 return;
             }
             String hospitalizationId = hospitalizationRequestIds.get(idx - 1);
-            Response response = hospitalizationController.approveHospitalization(hospitalizationId, doctor.getId());
+            Response response = hospitalizationController.approveHospitalization(hospitalizationId, doctorId);
             JOptionPane.showMessageDialog(this, response.getMessage());
             if (response.isSuccess()) {
                 refreshHospitalizationRequestsCombo();
             }
         } else if (jRadioButton6.isSelected()) {
             int idx = jComboBox8.getSelectedIndex();
-            if (idx <= 0 || idx > allPatients.size()) {
-                JOptionPane.showMessageDialog(this, "Selecciona un paciente.");
-                return;
-            }
-            Patient selectedPatient = allPatients.get(idx - 1);
             String date = jTextField21.getText().trim();
             String reason = jTextArea9.getText().trim();
             String observations = jTextArea1.getText().trim();
+            if (jComboBox4.getSelectedIndex() > 0 && jComboBox4.getSelectedIndex() <= pendingAppointmentIds.size()) {
+                String appointmentId = pendingAppointmentIds.get(jComboBox4.getSelectedIndex() - 1);
+                Response response = hospitalizationController.sendPatientToHospitalizationFromAppointment(
+                        appointmentId, doctorId, date, reason, "STANDARD", observations);
+                JOptionPane.showMessageDialog(this, response.getMessage());
+                if (response.isSuccess()) {
+                    jTextField21.setText("");
+                    jTextArea9.setText("");
+                    jTextArea1.setText("");
+                    refreshAppointmentCombos();
+                    refreshHospitalizationRequestsCombo();
+                    loadAppointmentsTable(jRadioButton4.isSelected());
+                }
+                return;
+            }
+            if (idx <= 0 || idx > patientIds.size()) {
+                JOptionPane.showMessageDialog(this, "Selecciona un paciente.");
+                return;
+            }
+            long selectedPatientId = patientIds.get(idx - 1);
             Response response = hospitalizationController.requestHospitalization(
-                    selectedPatient.getId(), doctor.getId(), date, reason, "STANDARD", observations);
+                    selectedPatientId, doctorId, date, reason, "STANDARD", observations);
             JOptionPane.showMessageDialog(this, response.getMessage());
             if (response.isSuccess()) {
                 jTextField21.setText("");
@@ -1359,12 +1386,12 @@ public class NewJFrame111 extends javax.swing.JFrame {
 
     private void btnSearchPatientHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
         int idx = jComboBox5.getSelectedIndex();
-        if (idx <= 0 || idx > allPatients.size()) {
+        if (idx <= 0 || idx > patientIds.size()) {
             JOptionPane.showMessageDialog(this, "Selecciona un paciente.");
             return;
         }
-        Patient selected = allPatients.get(idx - 1);
-        Response response = tableController.getPatientAppointmentsTableData(selected.getId());
+        long selectedPatientId = patientIds.get(idx - 1);
+        Response response = tableController.getPatientAppointmentsTableData(selectedPatientId);
         DefaultTableModel model = (DefaultTableModel) tblPatientHistory.getModel();
         model.setRowCount(0);
         if (!response.isSuccess() || response.getData() == null) {
@@ -1397,7 +1424,7 @@ public class NewJFrame111 extends javax.swing.JFrame {
             return;
         }
         String appointmentId = requestedAppointmentIds.get(idx - 1);
-        Response response = appointmentController.acceptAppointment(appointmentId, doctor.getId());
+        Response response = appointmentController.acceptAppointment(appointmentId, doctorId);
         JOptionPane.showMessageDialog(this, response.getMessage());
         if (response.isSuccess()) {
             refreshAppointmentCombos();
@@ -1414,7 +1441,7 @@ public class NewJFrame111 extends javax.swing.JFrame {
         String appointmentId = pendingAppointmentIds.get(idx - 1);
         Response response = appointmentController.completeAppointment(
                 appointmentId,
-                doctor.getId(),
+                doctorId,
                 jTextArea5.getText().trim(),
                 jTextArea6.getText().trim(),
                 jTextArea7.getText().trim(),
@@ -1459,7 +1486,7 @@ public class NewJFrame111 extends javax.swing.JFrame {
         }
 
         Response response = appointmentController.prescribeMedication(
-                appointmentId, doctor.getId(), medicationName, dose, administrationRoute,
+                appointmentId, doctorId, medicationName, dose, administrationRoute,
                 treatmentDuration, additionalInstructions, frecuency);
         JOptionPane.showMessageDialog(this, response.getMessage());
         if (response.isSuccess()) {
@@ -1483,7 +1510,7 @@ public class NewJFrame111 extends javax.swing.JFrame {
         }
         String appointmentId = reschedulableAppointmentIds.get(idx - 1);
         Response response = appointmentController.rescheduleAppointment(
-                appointmentId, doctor.getId(),
+                appointmentId, doctorId,
                 jTextField13.getText().trim(),
                 jTextField14.getText().trim()
         );

@@ -6,10 +6,10 @@ package packagee;
 
 import java.awt.Color;
 import javax.swing.JOptionPane;
+import org.json.JSONObject;
 import packagee.controller.AuthController;
 import packagee.controller.PatientController;
 import packagee.controller.response.Response;
-import packagee.storage.DataStore;
 
 public class NewJFrame extends javax.swing.JFrame {
 
@@ -415,22 +415,22 @@ public class NewJFrame extends javax.swing.JFrame {
             return;
         }
 
-        User selectedUser = DataStore.getInstance().findUserByUsername(username);
+        JSONObject userJson = new JSONObject(response.getData());
+        long userId = userJson.getLong("id");
+        String role = userJson.getString("role");
         txtLoginUsername.setText("");
         txtLoginPassword.setText("");
 
-        if (selectedUser instanceof Administrator) {
-            NewJFrame11 admin = new NewJFrame11(selectedUser);
+        if ("ADMIN".equals(role)) {
+            NewJFrame11 admin = new NewJFrame11(userId);
             admin.setVisible(true);
             this.dispose();
-        } else if (selectedUser instanceof Doctor) {
-            Doctor doctor = (Doctor) selectedUser;
-            NewJFrame111 doctorView = new NewJFrame111(selectedUser, doctor, false);
+        } else if ("DOCTOR".equals(role)) {
+            NewJFrame111 doctorView = new NewJFrame111(userId, userId, false);
             doctorView.setVisible(true);
             this.dispose();
-        } else if (selectedUser instanceof Patient) {
-            Patient patient = (Patient) selectedUser;
-            NewJFrame1 patientView = new NewJFrame1(selectedUser, patient, false);
+        } else if ("PATIENT".equals(role)) {
+            NewJFrame1 patientView = new NewJFrame1(userId, userId, false);
             patientView.setVisible(true);
             this.dispose();
         }
